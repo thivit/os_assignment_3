@@ -39,7 +39,7 @@ void merge(int leftstart, int leftend, int rightstart, int rightend)
 		k++;
 		i++;
 	}
-	while (j <= leftend)
+	while (j <= rightend)
 	{
 		B[k] = A[j];
 		k++;
@@ -58,7 +58,7 @@ void my_mergesort(int left, int right)
 	if (left >= right) return;
 
 	// divide into two subarrays.
-	int mid = left + (left + right) / 2;
+	int mid = left + (right - left) / 2;
 	my_mergesort(left, mid);
 	my_mergesort(mid + 1, right);
 

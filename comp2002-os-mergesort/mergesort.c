@@ -67,12 +67,58 @@ void my_mergesort(int left, int right)
 }
 
 /* this function will be called by the testing program. */
-void * parallel_mergesort(void *arg){
-		return NULL;
+void * parallel_mergesort(void *arg)
+{
+	// unpack arguments.
+	struct argument * args = (struct argument *)arg;
+	int left = args->left;
+	int right = args->right;
+	int level = args->level;
+
+	// return early for base cases.
+	if (left >= right) 
+	{
+		free(args);
+		return;
+	}
+	if (level >= cutoff)
+	{
+		my_mergesort(left, right);
+		free(args);
+		return;
+	}
+
+	// split into subarrays to be handled in seperate threads.
+	int mid = left + (right - left) / 2;
+
+	pthread_t leftThread;
+	pthread_t rightThread;
+
+	struct argument * leftArg = buildArgs(left, mid, level + 1);
+	struct argument * rightArg = buildArgs(mid + 1, right, level + 1);
+
+	pthread_create(&leftThread, NULL, parallel_mergesort, leftArg);
+	pthread_create(&rightThread, NULL, parallel_mergesort, rightArg);
+
+	pthread_join(leftThread, NULL);
+	pthread_join(rightThread, NULL);
+
+	merge(left, mid, mid + 1, right);
+
+	free(args);
+	return NULL;
 }
 
 /* we build the argument for the parallel_mergesort function. */
-struct argument * buildArgs(int left, int right, int level){
-		return NULL;
+struct argument * buildArgs(int left, int right, int level)
+{
+	// initliase argument pointer.
+	struct argument * p = malloc(sizeof(struct argument));
+
+	p->left = left;
+	p->right = right;
+	p-> level = level;
+
+	return p;
 }
 

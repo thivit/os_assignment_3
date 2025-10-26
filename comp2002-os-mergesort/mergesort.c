@@ -12,7 +12,18 @@ void merge(int leftstart, int leftend, int rightstart, int rightend){
 }
 
 /* this function will be called by parallel_mergesort() as its base case. */
-void my_mergesort(int left, int right){
+void my_mergesort(int left, int right)
+{
+	// return if single element in array.
+	if (left >= right) return;
+
+	// divide into two subarrays
+	int mid = left + (left + right) / 2;
+	my_mergesort(left, mid);
+	my_mergesort(mid + 1, right);
+
+	// merge subarrays.
+	merge(left, mid, mid + 1, right);
 }
 
 /* this function will be called by the testing program. */

@@ -8,81 +8,111 @@
 #include "mergesort.h"
 
 /* this function will be called by mergesort() and also by parallel_mergesort(). */
-void merge(int leftstart, int leftend, int rightstart, int rightend){
-	int i = leftstart;
-	int j = rightstart;
-	int k = leftstart;
+void merge(int leftstart, int leftend, int rightstart, int rightend)
+{
+    // this is the conquer step. merge two subarrays into one sorted subarray
+    
+    // B is temp array
+    int i = leftstart;  // left subarray
+    int j = rightstart; // right subarray
+    int k = leftstart;  // temp array
 
-	while (i <= leftend && j <= rightend) {
-		if (A[i] <= A[j]) {
-			B[k++] = A[i++];
-		}
-		else {
-			B[k++] = A[j++];
-		}
-	}
-	while (i <= leftend){
-		B[k++] = A[i++];
-	}
-	while (j <= rightend){
-		B[k++] = A[j++];
-	}
+    // merge subarrays (compare elements)
+    while (i <= leftend && j <= rightend)
+    {
+        if (A[i] < A[j])
+        {
+            B[k] = A[i];
+            i++;
+        }
+        else
+        {
+            B[k] = A[j];
+            j++;
+        }
+        k++;
+    }
 
-	memcpy(&A[leftstart], &B[leftstart], sizeof(int) * (rightend - leftstart +1));
+    // copy remaining elements from left then right subarrays
+    while (i <= leftend)
+    {
+        B[k] = A[i];
+        i++;
+        k++;
+    }
+
+    while (j <= rightend)
+    {
+        B[k] = A[j];
+        j++;
+        k++;
+    }
+
+    int size = rightend - leftstart + 1;
+    memcpy(A + leftstart, B + leftstart, size * sizeof(int));
 }
 
 /* this function will be called by parallel_mergesort() as its base case. */
-void my_mergesort(int left, int right){
-	if (left >= right) return;
+void my_mergesort(int left, int right)
+{
+    // base case
+    if (left >= right) return;
 
-	int mid = left + (right - left) / 2;
-	my_mergesort(left, mid);
-	my_mergesort(mid + 1, right);
+    int mid = left + (right - left) / 2;
+    my_mergesort(left, mid);
+    my_mergesort(mid + 1, right);
 
-	merge(left, mid, mid+1, right);
+    merge(left, mid, mid + 1, right);
 }
 
 /* this function will be called by the testing program. */
-void * parallel_mergesort(void *arg){
-	struct argument *a = (struct argument *)arg;
-	int left = a->left;
-	int right = a->right;
-	int level = a->level;
+void * parallel_mergesort(void* _args)
+{
+    struct argument* args = (struct argument*) args;
+    int left = args->left;
+    int right = args->right;
+    int level = args->level;
 
-	if (left >= right){
-		return NULL;
-	}
-	if (level >= cutoff){
-		my_mergesort(left, right);
-		return NULL;
-	}
+    if (left >= right)
+    {
+        free(args);
+        return;
+    }
 
-	int mid = left + (right-left) / 2;
-	pthread_t t1, t2;
+    if (level >= cutoff)
+    {
+        my_mergesort(left, right);
+        free(args);
+        return;
+    }
 
-	struct argument *a1 = buildArgs(left, mid, level + 1);
-	struct argument *a2 = buildArgs(mid + 1, right, level + 1);
+    // split into subarrays to be handled by different threads
+    int mid = left + (right - left) / 2;
+    pthread_t left_thread, right_thread;
 
-	pthread_create(&t1, NULL, parallel_mergesort, a1);
-	pthread_create(&t2, NULL, parallel_mergesort, a2);
+    struct argument* left_args = buildArgs(left, mid, level + 1);
+    struct argument* right_args = buildArgs(mid + 1, right, level + 1);
 
-	pthread_join(t1, NULL);
-	pthread_join(t2, NULL);
-	free(a1);
-	free(a2);
-	
-	merge(left, mid, mid + 1, right);
+    pthread_create(&left_thread, NULL, parallel_mergesort, left_args);
+    pthread_create(&right_thread, NULL, parallel_mergesort, right_args);
 
-	return NULL;
+    pthread_join(left_thread, NULL);
+    pthread_join(right_thread, NULL);
+
+    merge(left, mid, mid + 1, right);
+
+    free(args);
+    return NULL;
 }
 
 /* we build the argument for the parallel_mergesort function. */
-struct argument * buildArgs(int left, int right, int level){
-	struct argument *p = malloc(sizeof(struct argument));
+struct argument * buildArgs(int left, int right, int level)
+{
+    struct argument* args = malloc(sizeof(struct argument));
 
-	p->left = left;
-	p->right = right;
-	p->level = level;
-	return p;
+    p->left = left;
+    p->right = right;
+    p->level = level;
+
+    return p;
 }
-

@@ -117,7 +117,7 @@ struct argument * buildArgs(int left, int right, int level)
 
 	p->left = left;
 	p->right = right;
-	p-> level = level;
+	p->level = level;
 
 	return p;
 }

@@ -79,13 +79,13 @@ void * parallel_mergesort(void *arg)
 	if (left >= right) 
 	{
 		free(args);
-		return;
+		return NULL;
 	}
 	if (level >= cutoff)
 	{
 		my_mergesort(left, right);
 		free(args);
-		return;
+		return NULL;
 	}
 
 	// split into subarrays to be handled in seperate threads.

@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wpointer-arith -Wstrict-prototypes -std=gnu89 -fPIC -MMD -MP -lpthread
 
-all: test-mergesort unit-test
+all: test-mergesort 
 
 unit-test: unit-test.o mergesort.o
 	$(CC) $(CFLAGS) -o $@ $?
@@ -12,4 +12,4 @@ test-mergesort: test-mergesort.o mergesort.o
 
 .PHONY: clean
 clean:
-	/bin/rm -f *.o *.d test-mergesort unit-test
+	/bin/rm -f *.o *.d test-mergesort 

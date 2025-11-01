@@ -44,3 +44,6 @@ make
 - The parallelism is not too complicated (having done PDC last semester, its not completely new), we simply replace recursive calls with thread creation up to a certain core count
 
 - One thing that occured to me is that with this naive implementation, the work is not split completely equally. For example, at the first level of recursion, we split the original array into halves, with 2 child threads handling each half. Then, the next pair of threads handles the next two halves etc. To fully optimise it, we could split the original array into equal parts depending on the cutoff parameter, but thats probably beyond the scope of the assignment.
+
+## Sources Used
+- We used ChatGPT for explanation to better understand merge sort and the APIs being used in this scenario.

@@ -48,7 +48,7 @@ make
 ## Sources Used
 - We used ChatGPT for explanation to better understand merge sort and the APIs being used in this scenario.
 
-- Youtube Videos on the merge sort algorithm:
+- Youtube videos on the merge sort algorithm:
     - [Learn Merge Sort in 13 minutes](https://www.youtube.com/watch?v=3j0SWDX4AtU)
     - [2.7.2. Merge Sort Algorithm](https://www.youtube.com/watch?v=mB5HXBb_HY8)
 
